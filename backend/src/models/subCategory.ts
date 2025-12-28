@@ -17,4 +17,3 @@ const SubCategorySchema: Schema = new Schema({
 export default mongoose.model<ISubCategory>('SubCategory', SubCategorySchema);
 
 
-//category,prompt,subcategory,users

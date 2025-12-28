@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Prompt from '../models/category';
+import Prompt from '../models/prompt';
 import { generateLesson } from '../services/aiService';
 
 export const createPrompt = async (req: Request, res: Response) => {
