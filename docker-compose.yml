@@ -1,0 +1,13 @@
+name: learning-platform
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: learning-platform-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

@@ -1,0 +1,53 @@
+<div class="dashboard-wrapper">
+    <div class="header">
+        <h1>מרכז הלמידה האישי שלך</h1>
+        <p>בחר נושא וה-AI יבנה לך שיעור מותאם אישית</p>
+    </div>
+
+    <div class="card">
+        <div class="input-group">
+            <label for="category">מה תרצה ללמוד היום?</label>
+            <select id="category" [(ngModel)]="selectedCategoryId" (change)="onCategorySelect()">
+                <option value="" disabled>בחר תחום...</option>
+                <option *ngFor="let cat of categories" [value]="cat._id">{{ cat.name }}</option>
+            </select>
+        </div>
+
+        <div class="input-group" *ngIf="subCategories.length > 0">
+            <label for="subCategory">בחר נושא ספציפי:</label>
+            <select id="subCategory" [(ngModel)]="selectedSubCategoryId">
+                <option value="" disabled>בחר נושא...</option>
+                <option *ngFor="let sub of subCategories" [value]="sub._id">{{ sub.name }}</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="prompt">מה השאלה שלך?</label>
+            <textarea 
+                id="prompt"
+                [(ngModel)]="userPrompt" 
+                placeholder="למשל: הסבר לי על חורים שחורים כמו לילד בן 5..."
+                rows="4">
+            </textarea>
+        </div>
+
+        <button (click)="generateLesson()" [disabled]="loading || !selectedSubCategoryId || !userPrompt">
+            <span *ngIf="!loading">צור שיעור עכשיו</span>
+            <span *ngIf="loading" class="spinner">מעבד נתונים...</span>
+        </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-status">
+        <p>מייצר שיעור, אנא המתיני... ✨</p>
+    </div>
+
+    <div *ngIf="aiLesson && !loading" class="result-container">
+        <div class="result-header">
+            <h3>השיעור המוכן שלך:</h3>
+        </div>
+        <div class="lesson-content">
+            {{ aiLesson }}
+        </div>
+        <button class="secondary-button" (click)="aiLesson = ''">נקה תוצאה</button>
+    </div>
+</div>
