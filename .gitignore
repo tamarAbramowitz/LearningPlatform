@@ -1,14 +1,1 @@
-# Node
-node_modules/
-**/node_modules/
-
-# Build
-dist/
-build/
-
-# Env
-.env
-
-# OS
-.DS_Store
-Thumbs.db
+                .gitignore
