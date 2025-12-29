@@ -10,10 +10,18 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
-  // שליחת הפרומפט לשרת
+  getAllCategories(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/categories`);
+  }
+
+  register(userData: { name: string, phone: string }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/users/register`, userData);
+  }
+
   generateLesson(categoryId: string, subCategoryId: string, promptText: string): Observable<any> {
     const payload = {
-      category_id: categoryId,
+      user_id: localStorage.getItem('userId'),
+      category_id: categoryId,      
       sub_category_id: subCategoryId,
       prompt: promptText
     };

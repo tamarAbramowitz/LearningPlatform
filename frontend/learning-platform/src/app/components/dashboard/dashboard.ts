@@ -7,7 +7,6 @@ import { ApiService } from '../../services/api';
   selector: 'app-dashboard',
   standalone: true, 
   imports: [CommonModule, FormsModule], 
-  
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
@@ -15,21 +14,24 @@ export class DashboardComponent implements OnInit {
   categories: any[] = [];
   subCategories: any[] = [];
   
-  selectedCategoryId: string = '';
-  selectedSubCategoryId: string = '';
+  selectedCategoryName: string = '';
+  selectedSubCategoryName: string = '';
   userPrompt: string = '';
   
   aiLesson: string = ''; 
   loading: boolean = false;
 
   constructor(private apiService: ApiService) {}
+  
 
   ngOnInit() {
-    // כאן תוכלי לקרוא לסרוויס כדי לטעון את הקטגוריות הראשוניות ממונגו
-  }
-
+  this.apiService.getAllCategories().subscribe({ // ודאי שכתוב getAll ולא get
+    next: (res) => this.categories = res.data,
+    error: (err) => console.error('שגיאה בטעינת קטגוריות', err)
+  });
+}
   generateLesson() {
-    if (!this.userPrompt || !this.selectedSubCategoryId) {
+    if (!this.userPrompt || !this.selectedSubCategoryName) {
       alert("אנא מלאי את כל השדות");
       return;
     }
@@ -38,8 +40,8 @@ export class DashboardComponent implements OnInit {
     this.aiLesson = ''; 
 
     this.apiService.generateLesson(
-      this.selectedCategoryId, 
-      this.selectedSubCategoryId, 
+      this.selectedCategoryName, 
+      this.selectedSubCategoryName, 
       this.userPrompt
     ).subscribe({
       next: (res) => {
@@ -47,14 +49,10 @@ export class DashboardComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('שגיאה בשליחת הפרומפט:', err);
+        console.error('שגיאה ביצירת השיעור:', err);
         this.loading = false;
+        alert('קרתה שגיאה בחיבור לשרת');
       }
     });
-  }
-
-  onCategorySelect() {
-    console.log('נבחרה קטגוריה:', this.selectedCategoryId);
-    // כאן תוכלי לסנן את subCategories לפי הקטגוריה שנבחרה
   }
 }

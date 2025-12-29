@@ -1,49 +1,126 @@
-import { Request, Response } from 'express';
-import User from '../models/user'; 
-import Prompt from '../models/prompt';
+import { Request, Response, NextFunction } from 'express';
+import * as userService from '../services/userService';
+import User from '../models/User';
+import ErrorResponse from '../utils/aiResponse';
+import * as jwt from 'jsonwebtoken';
 
-export const registerUser = async (req: Request, res: Response) => {
-    try {
-        const { name, phone } = req.body;
 
-        if (!name || !phone) {
-            return res.status(400).json({ message: 'שם ומספר טלפון הם שדות חובה' });
-        }
+export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id, name, phone, role } = req.body;
 
-        let user = await User.findOne({ phone });
-        if (user) {
-            return res.status(200).json({ message: 'משתמש קיים', data: user });
-        }
-
-        user = new User({ name, phone });
-        await user.save();
-
-        res.status(201).json({ message: 'משתמש נרשם בהצלחה', data: user });
-    } catch (error: any) {
-        res.status(500).json({ message: 'שגיאה ברישום המשתמש', error: error.message });
+   
+    if (!id || !name || !phone) {
+      return next(new ErrorResponse('נא לספק תעודת זהות, שם ומספר טלפון', 400));
     }
+
+    //  בדיקה אם המשתמש כבר קיים לפי ID (תעודת זהות)
+    const existingUser = await User.findById(id);
+    if (existingUser) {
+      return next(new ErrorResponse('משתמש עם תעודת זהות זו כבר קיים במערכת', 400));
+    }
+
+    // בדיקה אם מספר הטלפון כבר תפוס
+    const existingPhone = await User.findOne({ phone });
+    if (existingPhone) {
+      return next(new ErrorResponse('מספר הטלפון הזה כבר רשום במערכת למשתמש אחר', 400));
+    }
+
+   
+    const user = await userService.createUser({ _id: id, name, phone, role: role || 'user' });
+
+   
+   // יצירת הטוקן
+    const secret = process.env.JWT_SECRET || 'fallbackSecretKey';
+    const expire = process.env.JWT_EXPIRE || '30d';
+
+    const token = jwt.sign(
+      { id: user._id },
+      secret as jwt.Secret, 
+      { expiresIn: expire as any }
+    );
+
+   
+    res.status(201).json({
+      success: true,
+      message: 'המשתמש נרשם בהצלחה',
+      token, 
+      data: user
+    });
+  } catch (error: any) {
+    next(error);
+  }
 };
 
-export const getUserHistory = async (req: Request, res: Response) => {
-    try {
-        const { userId } = req.params;
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id, phone, name } = req.body;
 
-        const history = await Prompt.find({ user_id: userId })
-            .populate('category_id', 'name')
-            .populate('sub_category_id', 'name')
-            .sort({ created_at: -1 }); // מהחדש לישן
-
-        res.status(200).json({ data: history });
-    } catch (error: any) {
-        res.status(500).json({ message: 'שגיאה בשליפת ההיסטוריה', error: error.message });
+    if (!id || !phone || !name) {
+      return next(new ErrorResponse('נא לספק שם, תעודת זהות ומספר טלפון', 400));
     }
+
+    
+    const user = await User.findOne({ _id: id, phone, name });
+
+    if (!user) {
+      return next(new ErrorResponse('פרטי התחברות שגויים', 401));
+    }
+
+    const secret = process.env.JWT_SECRET || 'fallbackSecretKey';
+    const expire = process.env.JWT_EXPIRE || '30d';
+
+    const token = jwt.sign(
+      { id: user._id },
+      secret as jwt.Secret,
+      { expiresIn: expire as any }
+    );
+
+    res.status(200).json({
+      success: true,
+      token,
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const getAllUsers = async (req: Request, res: Response) => {
-    try {
-        const users = await User.find();
-        res.status(200).json({ data: users });
-    } catch (error: any) {
-        res.status(500).json({ message: 'שגיאה בשליפת משתמשים', error: error.message });
+/**
+ * @route   GET /api/users
+ * @desc    שליפת כל המשתמשים (רק למנהלים)
+ */
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({ 
+      success: true, 
+      count: users.length, 
+      data: users 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route   GET /api/users/:id
+ * @desc    שליפת פרטי משתמש ספציפי לפי ID
+ */
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const user = await userService.findUserById(id);
+    
+    if (!user) {
+      return next(new ErrorResponse('משתמש לא נמצא', 404));
     }
+
+    res.status(200).json({ 
+      success: true, 
+      data: user 
+    });
+  } catch (error: any) {
+    next(error);
+  }
 };

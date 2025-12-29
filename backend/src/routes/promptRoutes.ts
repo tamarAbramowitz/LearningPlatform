@@ -1,9 +1,16 @@
-import { Router } from 'express';
-import { createPrompt } from '../controllers/promptController';
-import { validatePrompt } from '../middleware/validationMiddleware';
+import express from 'express';
+import { getAIContent, getHistory, getAllPrompts } from '../controllers/promptController';
+import { protect, authorize } from '../middleware/authorize';
 
-const router = Router();
+const router = express.Router();
 
-router.post('/', validatePrompt, createPrompt);
+
+router.post('/generate', protect, getAIContent);
+
+
+router.get('/history/:user_id', protect, getHistory);
+
+
+router.get('/all', protect, authorize('admin'), getAllPrompts);
 
 export default router;

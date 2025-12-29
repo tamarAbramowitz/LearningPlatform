@@ -1,22 +1,16 @@
-import { Router } from 'express';
-import User from '../models/category';
-import { registerUser, getUserHistory, getAllUsers } from '../controllers/userController';
+import express from 'express'; 
+import { registerUser, loginUser, getUserById, getAllUsers } from '../controllers/userController';
+import { protect, authorize } from '../middleware/authorize';
 
-const router = Router();
+const router = express.Router(); 
 
-router.post('/register', async (req, res) => {
-  try {
-    const { name, phone } = req.body;
-    const newUser = new User({ name, phone });
-    await newUser.save();
-    res.status(201).json(newUser);
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-});
 
-router.post('/register', registerUser); 
-router.get('/:userId/history', getUserHistory); 
-router.get('/admin/all', getAllUsers); 
+router.post('/register', registerUser);
+
+router.get('/', protect, authorize('admin'), getAllUsers);
+
+router.get('/:id', protect, getUserById);
+
+router.post('/login', loginUser);
 
 export default router;

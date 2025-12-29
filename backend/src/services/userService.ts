@@ -1,14 +1,10 @@
-import User from '../models/user';
+import User, { IUser } from '../models/User';
 
-export const findOrCreateUser = async (name: string, phone: string) => {
-    let user = await User.findOne({ phone });
-    if (!user) {
-        user = new User({ name, phone });
-        await user.save();
-    }
-    return user;
+export const createUser = async (userData: Partial<IUser>) => {
+  const user = await User.create(userData);
+  return user;
 };
 
-export const getAllUsersFromDb = async () => {
-    return await User.find();
+export const findUserById = async (id: string) => {
+  return await User.findById(id);
 };
