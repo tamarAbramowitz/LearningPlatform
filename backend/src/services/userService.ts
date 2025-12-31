@@ -1,7 +1,8 @@
-import User, { IUser } from '../models/User';
+import User, { IUser } from '../models/user';
 
 export const createUser = async (userData: Partial<IUser>) => {
-  const user = await User.create(userData);
+  const user = new User(userData);
+  await user.save();
   return user;
 };
 

@@ -1,0 +1,105 @@
+<mat-toolbar color="primary" class="navbar">
+    <span>מערכת למידה חכמה</span>
+    <span class="spacer"></span>
+
+    <div class="nav-links">
+        <button mat-button routerLink="/history">
+            <mat-icon>history</mat-icon>
+            ההיסטוריה שלי
+        </button>
+
+        <button mat-button *ngIf="isAdmin" routerLink="/admin" class="admin-link">
+            <mat-icon>admin_panel_settings</mat-icon>
+            ניהול מערכת
+        </button>
+    </div>
+
+    <span class="welcome-text"> 👋 ! שלום ,{{ userName }} </span>
+    <button mat-icon-button (click)="logout()" title="התנתקות">
+        <mat-icon>logout</mat-icon>
+    </button>
+</mat-toolbar>
+
+<div class="dashboard-container">
+    <mat-card class="main-card card">
+        <mat-card-header>
+            <mat-card-title>יצירת שיעור חדש</mat-card-title>
+            <mat-card-subtitle>בחר קטגוריה ונושא כדי להתחיל</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="card-content">
+            <form #lessonForm="ngForm">
+                <div class="selection-area">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>חפש או הוסף קטגוריה</mat-label>
+                        <input type="text" matInput [(ngModel)]="categorySearch" name="category"
+                            placeholder="הקלד קטגוריה..." [matAutocomplete]="auto" (input)="filterCategories()"
+                            autocomplete="on">
+                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCategorySelected($event)">
+                            <mat-option *ngFor="let cat of filteredCategories" [value]="cat.name">
+                                {{ cat.name }}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>תת-קטגוריה</mat-label>
+                        <input type="text" matInput [(ngModel)]="subCategorySearch" name="subCategory"
+                            placeholder="הקלד נושא..." [matAutocomplete]="autoSub" (input)="filterSubCategories()"
+                            autocomplete="on">
+                        <mat-autocomplete #autoSub="matAutocomplete">
+                            <mat-option *ngFor="let sub of filteredSubCategories" [value]="sub.name">
+                                {{ sub.name }}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>מה תרצה ללמוד?</mat-label>
+                        <textarea matInput [(ngModel)]="userPrompt" name="prompt"
+                            placeholder="למשל: הסבר לי על חוקי ניוטון בצורה פשוטה" autocomplete="on"></textarea>
+                    </mat-form-field>
+                </div>
+
+                <button mat-raised-button color="accent" class="generate-btn btn-primary"
+                    [disabled]="isLoading || !categorySearch || !userPrompt" (click)="generateLesson()">
+                    <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+                    <span *ngIf="!isLoading">צור שיעור עכשיו</span>
+                </button>
+            </form>
+        </mat-card-content>
+
+        <div *ngIf="isLoading" class="response-area">
+            <div class="skeleton-loader skeleton-title"></div>
+            <div class="skeleton-loader skeleton-text"></div>
+            <div class="skeleton-loader skeleton-text"></div>
+            <div class="skeleton-loader skeleton-text"></div>
+        </div>
+
+        <mat-card-footer *ngIf="lessonData" class="response-area">
+            <div class="lesson-result-container">
+                <div class="lesson-header">
+                    <h2 class="lesson-title">
+                        <mat-icon>history_edu</mat-icon>
+                        {{ lessonData.topic }}
+                    </h2>
+                    <span *ngIf="lessonData.isMock" class="offline-badge">מצב גיבוי (Offline)</span>
+                </div>
+
+                <div class="lesson-section">
+                    <h3 class="section-title">📚 תוכן לימודי</h3>
+                    <div class="lesson-content">{{ lessonData.content }}</div>
+                </div>
+
+                <div class="lesson-section exercises" *ngIf="lessonData.exercises?.length">
+                    <h3 class="section-title">✍️ תרגול ומשימות</h3>
+                    <ul class="exercise-list">
+                        <li *ngFor="let ex of lessonData.exercises" class="exercise-item">
+                            {{ ex }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</div>

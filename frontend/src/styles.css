@@ -1,0 +1,29 @@
+/* מרכז את כל דפי הכניסה */
+.welcome-wrapper, .auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  direction: rtl; /* תמיכה בעברית */
+}
+
+mat-card {
+  width: 400px;
+  padding: 20px;
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+.error-snackbar {
+  background-color: #d32f2f !important; 
+  color: white !important;
+  direction: rtl !important;
+  text-align: right;
+}
+
+.error-snackbar .mat-mdc-snack-bar-label {
+  font-weight: 500;
+}

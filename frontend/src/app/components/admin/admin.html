@@ -1,0 +1,72 @@
+<mat-toolbar color="warn" class="admin-toolbar toolbar">
+    <span>פאנל ניהול - מערכת למידה חכמה</span>
+
+    <span class="spacer"></span>
+
+    <button mat-raised-button color="basic" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon>
+        חזרה ללוח המחוונים
+    </button>
+</mat-toolbar>
+<div class="admin-container" style="padding: 20px;">
+
+    <h3>ניהול משתמשים</h3>
+    <table mat-table [dataSource]="allUsers" class="mat-elevation-z8 table">
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> שם </th>
+            <td mat-cell *matCellDef="let user"> {{user.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef> טלפון </th>
+            <td mat-cell *matCellDef="let user"> {{user.phone}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef> תפקיד </th>
+            <td mat-cell *matCellDef="let user"> {{user.role}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> פעולות </th>
+            <td mat-cell *matCellDef="let user">
+                <button mat-button color="primary" (click)="viewHistory(user._id)">צפה בפעילות</button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="userColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: userColumns;"></tr>
+    </table>
+    <mat-paginator [length]="totalUsers" [pageSize]="userPageSize" [pageSizeOptions]="[5, 10, 20]" (page)="onUserPageChange($event)"></mat-paginator>
+
+    <hr style="margin: 40px 0;">
+
+    <h3>כל היסטוריית הלמידה</h3>
+    <table mat-table [dataSource]="allHistory" class="mat-elevation-z8 table">
+        <ng-container matColumnDef="userName">
+            <th mat-header-cell *matHeaderCellDef> שם המשתמש </th>
+            <td mat-cell *matCellDef="let entry"> {{entry.user_id?.name || 'משתמש לא ידוע'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> תאריך </th>
+            <td mat-cell *matCellDef="let entry"> {{entry.created_at | date:'short'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="prompt">
+            <th mat-header-cell *matHeaderCellDef> שאילתה </th>
+            <td mat-cell *matCellDef="let entry"> {{entry.prompt}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="view">
+            <th mat-header-cell *matHeaderCellDef> פעולה </th>
+            <td mat-cell *matCellDef="let entry">
+                <button mat-raised-button color="accent">פתח תוכן</button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="historyColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: historyColumns;"></tr>
+    </table>
+    <mat-paginator [length]="totalHistory" [pageSize]="historyPageSize" [pageSizeOptions]="[5, 10, 20]" (page)="onHistoryPageChange($event)"></mat-paginator>
+</div>
