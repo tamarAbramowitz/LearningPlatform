@@ -8,21 +8,30 @@ An AI-driven learning platform (Mini MVP) built with Node.js/TypeScript backend 
 
 ## Technologies Used
 ### Backend
-- Node.js with TypeScript
+- Node.js with TypeScript (bonus implementation)
 - Express.js for REST API
 - MongoDB with Mongoose
 - OpenAI GPT-3.5-turbo for AI integration
-- JWT for authentication
+- JWT for authentication (bonus implementation)
 - Docker for database
 
 ### Frontend
-- Angular with TypeScript
+- Angular with TypeScript (bonus implementation)
 - Angular Material for UI components
+
+## Architecture
+The project is built in layers as required:
+- **Controllers**: Handle HTTP requests and responses
+- **Models**: Define data schemas with Mongoose
+- **Services**: Contain business logic and external integrations
 
 ## Prerequisites
 - Node.js 18+
 - Docker and Docker Compose
 - OpenAI API key
+
+## Assumptions
+- The system is designed to work seamlessly even without an active AI connection. If the AI API is unavailable, the platform automatically switches to "Offline Mode," providing pre-defined learning content to ensure a continuous user experience.
 
 ## Local Setup
 1. Clone the repository
@@ -33,16 +42,26 @@ An AI-driven learning platform (Mini MVP) built with Node.js/TypeScript backend 
 6. Install frontend dependencies: `cd frontend && npm install`
 7. Start frontend: `npm start`
 
+### .env Configuration Example
+```
+# .env Example
+PORT=3000
+MONGO_URI=mongodb+srv://...
+JWT_SECRET=your_secret_key
+OPENAI_API_KEY=your_api_key_here
+```
+
 ## Running the Application
 - Backend: http://localhost:3000
 - Frontend: http://localhost:4200
 
 ## Features
-- User registration and login
+- User registration and login with JWT authentication
 - Category and sub-category selection
-- AI-powered lesson generation
+- AI-powered lesson generation with offline fallback
 - Learning history tracking
-- Admin dashboard for user management
+- Admin dashboard for user management (accessible via Dashboard for users with Admin role)
+- AI Offline Fallback: Automatic switch to "Offline Mode" with pre-defined content when AI API is unavailable
 
 ## API Documentation
 See backend README for detailed API endpoints.
