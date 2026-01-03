@@ -16,11 +16,16 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+const PORT = process.env.PORT || 5000;
 
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/ai_learning';
-mongoose.connect(mongoURI).then(() => console.log('Connected to MongoDB'));
+mongoose.connect(mongoURI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); 
+  });
 
-// Swagger setup
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -31,7 +36,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:5000',
+        url: `http://localhost:${PORT}`, 
+        description: 'Local server',
       },
     ],
     components: {
@@ -44,7 +50,7 @@ const swaggerOptions = {
       },
     },
   },
-  apis: ['./src/routes/*.ts'], // paths to files containing OpenAPI definitions
+  apis: ['./src/routes/*.ts', './dist/routes/*.js'], 
 };
 
 const specs = swaggerJsdoc(swaggerOptions);
@@ -58,5 +64,4 @@ app.use('/api/users', userRoutes);
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

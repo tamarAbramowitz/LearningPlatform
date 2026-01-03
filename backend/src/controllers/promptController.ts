@@ -17,7 +17,7 @@ export const getAIContent = async (req: Request, res: Response) => {
 
     // Fetch category and sub-category names
     const category = await Category.findById(category_id);
-    const subCategory = sub_category_id ? await SubCategory.findById(sub_category_id) : null;
+    const subCategory = sub_category_id ? (mongoose.Types.ObjectId.isValid(sub_category_id) ? await SubCategory.findById(sub_category_id) : await SubCategory.findOne({ name: sub_category_id })) : null;
     const categoryName = category ? category.name : 'לא ידוע';
     const subCategoryName = subCategory ? subCategory.name : sub_category_id;
 
