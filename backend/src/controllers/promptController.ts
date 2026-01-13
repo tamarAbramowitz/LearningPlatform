@@ -3,6 +3,7 @@ import IPrompt from '../models/prompt';
 import Category from '../models/category';
 import SubCategory from '../models/subCategory';
 import { generateLearningContent } from '../services/promptService';
+import mongoose from 'mongoose';
 
 
 export const getAIContent = async (req: Request, res: Response) => {
